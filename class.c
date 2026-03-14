@@ -1,0 +1,158 @@
+#include "class.h"
+
+char kname[2][10] = {"A+~F", "P/F"};
+
+int loadData(struct st_class* c[]) {
+    int count = 0;
+    FILE* file = fopen("classes.txt", "r");
+    if (file == NULL) return 0;
+
+    while (!feof(file)) {
+        c[count] = (struct st_class*)malloc(sizeof(struct st_class));
+        int r = fscanf(file, "%d %s %d %d", &(c[count]->code), c[count]->name, &(c[count]->unit), &(c[count]->grading));
+        if (r < 4) {
+            free(c[count]);
+            break;
+        }
+        count++;
+    }
+    fclose(file);
+    return count;
+}
+
+void printAllClasses(struct st_class* c[], int csize) {
+    for (int i = 0; i < csize; i++) {
+        printf("[%d] %s [credit %d - %s]\n", c[i]->code, c[i]->name, c[i]->unit, kname[c[i]->grading - 1]);
+    }
+}
+
+void saveAllClasses(struct st_class* c[], int csize) {
+    FILE* file = fopen("classes.txt", "w");
+    for (int i = 0; i < csize; i++) {
+        fprintf(file, "%d %s %d %d\n", c[i]->code, c[i]->name, c[i]->unit, c[i]->grading);
+    }
+    fclose(file);
+}
+
+void findClasses(char* name, struct st_class* c[], int csize) {
+    int count = 0;
+    printf("Searching (keyword : %s)\n", name);
+    for (int i = 0; i < csize; i++) {
+        if (strstr(c[i]->name, name)) {
+            printf("[%d] %s [credit %d - %s]\n", c[i]->code, c[i]->name, c[i]->unit, kname[c[i]->grading - 1]);
+            count++;
+        }
+    }
+    printf("%d classes found.\n", count);
+}
+
+int addNewClass(struct st_class* c[], int csize) {
+    struct st_class* p = (struct st_class*)malloc(sizeof(struct st_class));
+    printf(">> code number > ");
+    scanf("%d", &(p->code));
+
+    for (int i = 0; i < csize; i++) {
+        if (c[i]->code == p->code) {
+            printf("이미 추가되어 있는 과목입니다!\n");
+            free(p);
+            return csize;
+        }
+    }
+    printf(">> class name > ");
+    scanf("%s", p->name);
+    printf(">> credits > ");
+    scanf("%d", &(p->unit));
+    printf(">> grading (1: A+~F, 2: P/F) > ");
+    scanf("%d", &(p->grading));
+
+    c[csize] = p;
+    return csize + 1;
+}
+
+void editClass(struct st_class* c[], int csize) {
+    int code;
+    struct st_class* p = NULL;
+    printf(">> Enter a code of class > ");
+    scanf("%d", &code);
+
+    for (int i = 0; i < csize; i++) {
+        if (c[i]->code == code) {
+            p = c[i];
+            break;
+        }
+    }
+
+    if (p == NULL) {
+        printf("코드가 존재하지 않는 코드 입니다.\n");
+        return;
+    }
+
+    printf("> Current: [%d] %s [credits %d - %s]\n", p->code, p->name, p->unit, kname[p->grading - 1]);
+    printf("> Enter new class name > ");
+    scanf("%s", p->name);
+    printf("> Enter new credits > ");
+    scanf("%d", &(p->unit));
+    printf("> Enter new grading(1:Grade, 2: P/F) > ");
+    scanf("%d", &(p->grading));
+    printf("> Modified.\n");
+}
+
+int applyMyClasses(int my[], int msize, struct st_class* c[], int csize) {
+    int code;
+    printf(">> Enter class code to apply > ");
+    scanf("%d", &code);
+
+    int found = 0;
+    for (int i = 0; i < csize; i++) {
+        if (c[i]->code == code) {
+            found = 1;
+            break;
+        }
+    }
+    if (!found) {
+        printf("코드를 못찾았습니다.\n");
+        return msize;
+    }
+
+    for (int i = 0; i < msize; i++) {
+        if (my[i] == code) {
+            printf("중복된 수강 신청입니다.\n");
+            return msize;
+        }
+    }
+
+    my[msize] = code;
+    printf("수강 신청 완료!\n");
+    return msize + 1;
+}
+
+void printMyClasses(int my[], int msize, struct st_class* c[], int csize) {
+    printf("> List of My Classes (%d classes)\n", msize);
+    for (int i = 0; i < msize; i++) {
+        for (int j = 0; j < csize; j++) {
+            if (my[i] == c[j]->code) {
+                printf("%d. [%d] %s [credit %d - %s]\n", i + 1, c[j]->code, c[j]->name, c[j]->unit, kname[c[j]->grading - 1]);
+                break;
+            }
+        }
+    }
+}
+
+void saveMyClass(int my[], int msize, struct st_class* c[], int csize) {
+    FILE* file = fopen("my_classes.txt", "w");
+    if (file == NULL) return;
+
+    int total_units = 0;
+    fprintf(file, "My Applied Classes:\n");
+    for (int i = 0; i < msize; i++) {
+        for (int j = 0; j < csize; j++) {
+            if (my[i] == c[j]->code) {
+                fprintf(file, "- [%d] %s (Credits: %d)\n", c[j]->code, c[j]->name, c[j]->unit);
+                total_units += c[j]->unit;
+                break;
+            }
+        }
+    }
+    fprintf(file, "\nTotal Credits: %d\n", total_units);
+    fclose(file);
+}
