@@ -138,6 +138,15 @@ int addNewClass(struct st_class* c[], int csize){
 
 	printf(">> code number > ");
 	scanf("%d", &(p->code));
+
+	// 중복되어 있는지 확인해야 함 .. 
+	for(int i = 0; i < csize; i++){
+		if(c[i]->code == p->code){
+			printf("이미 추가되어 있는 과목입니다!"); 
+			free(p);
+			return csize;
+		}
+	}
 	printf(">> class name > ");
 	scanf("%s", p->name);
 	printf(">> credits > ");
@@ -145,7 +154,7 @@ int addNewClass(struct st_class* c[], int csize){
 	printf(">> grading (1: A+~F, 2: P/F) > ");
 	scanf("%d", &(p->grading));
 
-	c[csize] = p;
+	c[csize] = p; //배열에 추가
 	return csize+1;
 }
 
