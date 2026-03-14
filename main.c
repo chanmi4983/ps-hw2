@@ -31,9 +31,7 @@ int main(void) {
             scanf("%s", name);
             findClasses(name, classes, count);
         } else if (no == 5) {
-            count = applyMyClasses(myclass, mycount, classes, count); // applyMyClasses 내부 로직 수정 필요 시 확인
-            // 위 학생 코드 수정: mycount를 업데이트해야 함
-            mycount = applyMyClasses(myclass, mycount, classes, count);
+			mycount = applyMyClasses(myclass, mycount, classes, count);
         } else if (no == 6) {
             printMyClasses(myclass, mycount, classes, count);
         } else if (no == 7) {

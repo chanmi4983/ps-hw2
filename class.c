@@ -99,31 +99,36 @@ void editClass(struct st_class* c[], int csize) {
 
 int applyMyClasses(int my[], int msize, struct st_class* c[], int csize) {
     int code;
-    printf(">> Enter class code to apply > ");
+    printf(">> Enter class code to apply > "); 
     scanf("%d", &code);
-
-    int found = 0;
-    for (int i = 0; i < csize; i++) {
-        if (c[i]->code == code) {
+    
+    // 1. 전체 목록에 존재하는 과목인지 확인 
+    int found = 0; 
+    for(int i = 0; i < csize; i++) {
+        if(c[i]->code == code) {
             found = 1;
+            printf("[%s] 과목을 찾았습니다.\n", c[i]->name); 
             break;
         }
     }
-    if (!found) {
-        printf("코드를 못찾았습니다.\n");
-        return msize;
+    
+    if(!found) {
+        printf("해당 코드를 가진 과목이 존재하지 않습니다.\n");
+        return msize; 
     }
 
-    for (int i = 0; i < msize; i++) {
-        if (my[i] == code) {
-            printf("중복된 수강 신청입니다.\n");
-            return msize;
+    // 2. 이미 신청한 과목인지 중복 체크 
+    for(int i = 0; i < msize; i++) {
+        if(my[i] == code) {
+            printf("이미 수강 신청된 과목입니다.\n");
+            return msize; // 개수 변화 없이 반환
         }
     }
 
+    // 3. 신청 목록에 추가
     my[msize] = code;
-    printf("수강 신청 완료!\n");
-    return msize + 1;
+    printf("수강 신청이 완료되었습니다.\n");
+    return msize + 1; 
 }
 
 void printMyClasses(int my[], int msize, struct st_class* c[], int csize) {
@@ -142,17 +147,47 @@ void saveMyClass(int my[], int msize, struct st_class* c[], int csize) {
     FILE* file = fopen("my_classes.txt", "w");
     if (file == NULL) return;
 
-    int total_units = 0;
-    fprintf(file, "My Applied Classes:\n");
+    int total_units = 0;      // 총 수강학점
+    int grade_units = 0;      // Grade 방식(A+~F) 총 학점
+    int pf_units = 0;         // P/F 방식 총 학점
+    int grade_count = 0;      // Grade 방식 과목 수
+    int pf_count = 0;         // P/F 방식 과목 수
+
+    fprintf(file, "My Applied Classes List:\n");
+    fprintf(file, "------------------------------------------\n");
+
     for (int i = 0; i < msize; i++) {
         for (int j = 0; j < csize; j++) {
             if (my[i] == c[j]->code) {
-                fprintf(file, "- [%d] %s (Credits: %d)\n", c[j]->code, c[j]->name, c[j]->unit);
+                // 1. 과목 정보 저장 (코드, 과목명, 학점, 평가방식)
+                fprintf(file, "- [%d] %-15s | Credits: %d | Type: %s\n", 
+                        c[j]->code, c[j]->name, c[j]->unit, kname[c[j]->grading - 1]);
+                
+                // 2. 전체 통계 누적
                 total_units += c[j]->unit;
-                break;
+
+                // 3. 평가방식별 상세 통계 분기 로직 (if-else 사용)
+                if (c[j]->grading == 1) { // Grade 방식 (A+~F)
+                    grade_units += c[j]->unit;
+                    grade_count++;
+                } else { // P/F 방식
+                    pf_units += c[j]->unit;
+                    pf_count++;
+                }
+                break; 
             }
         }
     }
-    fprintf(file, "\nTotal Credits: %d\n", total_units);
+
+    // 4. 최종 통계 리포트 출력
+    fprintf(file, "------------------------------------------\n");
+    fprintf(file, "STATISTICS REPORT\n");
+    fprintf(file, "1. Total Applied Classes: %d\n", msize);
+    fprintf(file, "2. Total Applied Credits: %d\n", total_units);
+    fprintf(file, "3. By Grading Type:\n");
+    fprintf(file, "   - Grade Type (A+~F): %d classes, %d credits\n", grade_count, grade_units);
+    fprintf(file, "   - P/F Type: %d classes, %d credits\n", pf_count, pf_units);
+    fprintf(file, "------------------------------------------\n");
+
     fclose(file);
 }
