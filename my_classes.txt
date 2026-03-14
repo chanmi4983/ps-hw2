@@ -1,0 +1,12 @@
+My Applied Classes List:
+------------------------------------------
+- [99] like            | Credits: 3 | Type: P/F
+- [101] C               | Credits: 3 | Type: A+~F
+------------------------------------------
+STATISTICS REPORT
+1. Total Applied Classes: 2
+2. Total Applied Credits: 6
+3. By Grading Type:
+   - Grade Type (A+~F): 1 classes, 3 credits
+   - P/F Type: 1 classes, 3 credits
+------------------------------------------
