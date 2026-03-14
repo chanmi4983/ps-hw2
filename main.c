@@ -195,20 +195,44 @@ void editClass(struct st_class* c[], int csize){
 
 
 // You must make all these functions.
-
 int applyMyClasses(int my[], int msize, struct st_class* c[], int csize){
-
-
-
+	int code;
+	scanf("%d", &code);
 	
-	return 0;
+	int found = 0; 
+	for(int i = 0; i < csize; i++){
+		if(c[i]->code == code){
+			found = 1;
+			printf("찾았습니다!"); 
+			break;
+		}
+	}
+	if(found =! 1){
+		printf("코드를 못찾았습니다.");
+		return msize;
+	}
+
+	for(int i = 0; i < msize; i++) {
+        if(my[i] == code) {
+            printf("중복된 코드입니다.\n");
+            return msize;
+        }
+    }
+
+	my[msize] = code;
+    return msize + 1;
 }
 
 void printMyClasses(int my[], int msize, struct st_class* c[], int csize){
-
-
-	
-
+	printf("> List of My Classes (%d classes)\n", msize);
+		for(int i = 0; i < msize; i++) {
+			for(int j = 0; j < csize; j++) {
+				if(my[i] == c[j]->code) {
+					printf("%d. [%d] %s [credit %d - %s]\n", i+1, c[j]->code, c[j]->name, c[j]->unit, kname[c[j]->grading-1]);
+					break;
+				}
+			}
+    }
 }
 
 void saveMyClass(int my[], int msize, struct st_class* c[], int csize){
