@@ -166,8 +166,19 @@ void editClass(struct st_class* c[], int csize){
 
 	
 	// You must complete this section.
-    
+	// 입력된 걸로 바꿔야 함. 
+	for(int i = 0; i < csize; i++){
+		if(c[i]->code == p->code){
+			p = c[i];
+			printf("수정되었습니다!"); 
+			break;
+		}
+	}
 
+	if(p == NULL){
+		printf("코드가 존재하지 않는 코드 입니다. ");
+		return; 
+	}
 
 	
 	printf("> Current: [%d] %s [credits %d - %s]\n",p->code, p->name, p->unit, kname[p->grading-1]);
